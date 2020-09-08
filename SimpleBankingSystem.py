@@ -37,7 +37,8 @@ class Bank:
 
     def create_account(self):
         while True:
-            account_num = "400000" + self.random_digits(10)
+            account_num = "400000" + self.random_digits(9)
+            account_num += self.luhn_check_num(account_num)
             pin = self.random_digits(4)
             if account_num in self.ledger:
                 continue
@@ -83,6 +84,22 @@ class Bank:
     def random_digits(n):
         """Return n random digits between 0 and 9 as a string."""
         return "".join(str(random.randrange(10)) for _ in range(n))
+
+    @staticmethod
+    def luhn_control(digits):
+        """Return the Luhn control number as an integer. digits must be an iterable representing the digits to be checked, not including the check."""
+        digit_list = [int(n) if i % 2 else int(n) * 2 for i, n in enumerate(digits[::-1])]
+        return sum(n - 9 if n > 9 else n for n in digit_list)
+
+    @staticmethod
+    def luhn_valid(digits):
+        """Return True if the digits comply with the Luhn algorithm, False otherwise."""
+        return not (Bank.luhn_control(digits[:-1]) + int(digits[-1])) % 10
+
+    @staticmethod
+    def luhn_check_num(digits):
+        """Return the Luhn check number for an iterable of digits as a string."""
+        return str(Bank.luhn_control(digits) * 9 % 10)
 
 
 system = Bank()
